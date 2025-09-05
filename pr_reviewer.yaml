@@ -1,0 +1,6 @@
+model: gpt-4o-mini
+max_file_bytes: 20000
+max_total_files: 20
+languages_hint: ["python", "javascript", "typescript", "go", "cpp"]
+comment_title: "🤖 LLM PR Review"
+fail_on_severe_findings: false

@@ -1,0 +1,13 @@
+diff --git a/app.py b/app.py
+index e69de29..4b825dc 100644
+--- a/app.py
++++ b/app.py
+@@ -0,0 +1,8 @@
++import subprocess
++
++def run(user_input):
++    # BAD: shell=True
++    subprocess.run(f"echo {user_input}", shell=True)
++    print("done")
++    return True
++

@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: llm-pr-reviewer
+Version: 0.1.0
+Summary: LLM-powered GitHub Pull Request reviewer
+Author: Your Name
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: openai>=1.47.0
+Requires-Dist: requests>=2.32.3
+Requires-Dist: PyYAML>=6.0.2
+Requires-Dist: tqdm>=4.66.5
+Dynamic: license-file
+
+# LLM PR Reviewer
+
+A lightweight, production-ready **LLM‑powered pull request reviewer** you can drop into any repo.  
+It runs in GitHub Actions on every PR, fetches the diff, generates targeted suggestions (security, style, clarity), and posts a **single tidy comment** on the PR.
+
+https://img.shields.io/badge/PR%20review-LLM-blue
+
+---
+
+## ✨ Features
+- 🔎 Pulls changed files and diffs directly from the GitHub API
+- 🤖 Uses OpenAI for review suggestions (model configurable)
+- 🛡️ Built-in static checks (security + style) to complement the LLM
+- 📝 Posts a single, well-formatted comment to your PR (or `--dry-run` locally)
+- ⚙️ Easy to configure via `pr_reviewer.yaml`
+- 🧪 Comes with tests and a local runner script
+
+---
+
+## 🚀 Quick Start (Local)
+1. **Create a virtualenv** and install:
+   ```bash
+   python -m venv .venv && source .venv/bin/activate
+   pip install -e .
+   ```
+
+2. **Set your API key**:
+   ```bash
+   export OPENAI_API_KEY="sk-..."
+   ```
+
+3. **Dry run against a PR** (prints the review instead of posting):
+   ```bash
+   python -m pr_reviewer.main --repo monjitboro/PR-Reviewer --pr 1 --dry-run --token $GITHUB_TOKEN
+   ```
+   > `--token` can be a classic PAT or a `GITHUB_TOKEN` when running inside Actions.
+
+---
+
+## ☁️ GitHub Actions Setup
+Add repository secrets:
+- `OPENAI_API_KEY` – your OpenAI API key
+- (Optional) none; the Action uses the built-in `GITHUB_TOKEN`
+
+The workflow is already provided at `.github/workflows/pr-reviewer.yml` and runs on each `pull_request`.
+
+---
+
+## 🔧 Configuration
+Create `pr_reviewer.yaml` in the repo root (a default ships with this project):
+```yaml
+model: gpt-4o-mini
+max_file_bytes: 20000     # per-file diff cutoff
+max_total_files: 20       # limit number of files processed
+languages_hint: ["python", "javascript", "typescript", "go", "cpp"]
+comment_title: "🤖 LLM PR Review"
+fail_on_severe_findings: false   # set true to fail CI on criticals
+```
+
+---
+
+## 💡 How it Works
+1. On PR events, we read the event JSON to get `{owner, repo, pr}`.
+2. We call the GitHub API to fetch changed files + patches.
+3. We run quick static checks (security, style).
+4. We send concise prompts with diff chunks to the LLM for actionable suggestions.
+5. We combine everything into a single Markdown comment and post it to the PR.
+
+---
+
+## 🧪 Tests
+```bash
+pytest -q
+```
+
+---
+
+## 📄 License
+MIT
